@@ -1,4 +1,3 @@
-// import {StatusBar} from 'expo-status-bar';
 import React from 'react';
 import {
   StyleSheet,
@@ -8,9 +7,18 @@ import {
   Dimensions,
   Animated,
   StatusBar,
-  FlatList,
+  Platform,
 } from 'react-native';
 import data from '../../services/data';
+
+interface HeadseatUrbanEars {
+  type: string;
+  imageUri: string;
+  heading: string;
+  description: string;
+  key: string;
+  color: string;
+}
 
 const {width, height} = Dimensions.get('window');
 const LOGO_WIDTH = 220;
@@ -73,7 +81,13 @@ const Ticker = ({scrollX}) => {
   );
 };
 
-const Item = ({imageUri, heading, description, index, scrollX}) => {
+const Item = ({
+  imageUri,
+  heading,
+  description,
+  index,
+  scrollX,
+}: HeadseatUrbanEars) => {
   const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
   const inputRangeOpacity = [
     (index - 0.3) * width,
@@ -86,11 +100,11 @@ const Item = ({imageUri, heading, description, index, scrollX}) => {
   });
   const translateXHeading = scrollX.interpolate({
     inputRange,
-    outputRange: [width * 0.2, 0, -width * 0.2],
+    outputRange: [width * 0.1, 0, -width * 0.1],
   });
   const translateXDescription = scrollX.interpolate({
     inputRange,
-    outputRange: [width * 0.6, 0, -width * 0.6],
+    outputRange: [width * 0.7, 0, -width * 0.7],
   });
   const opacity = scrollX.interpolate({
     inputRange: inputRangeOpacity,
@@ -122,9 +136,25 @@ const Item = ({imageUri, heading, description, index, scrollX}) => {
   );
 };
 
-const Pagination = () => {
+const Pagination = ({scrollX}) => {
+  const inputRange = [-width, 0, width];
+  const translateX = scrollX.interpolate({
+    inputRange,
+    outputRange: [-DOT_SIZE, 0, DOT_SIZE],
+  });
+
   return (
-    <View style={[styles.pagination]}>
+    <View style={styles.pagination}>
+      <Animated.View
+        style={[
+          styles.paginationIndicator,
+          // eslint-disable-next-line react-native/no-inline-styles
+          {
+            position: 'absolute',
+            transform: [{translateX}],
+          },
+        ]}
+      />
       {data.map((item) => {
         return (
           <View key={item.key} style={styles.paginationDotContainer}>
@@ -142,7 +172,7 @@ export default function App() {
   const scrollX = React.useRef(new Animated.Value(0)).current;
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" hidden />
+      <StatusBar hidden />
       <Circle scrollX={scrollX} />
       <Animated.FlatList
         keyExtractor={(item) => item.key}
@@ -153,16 +183,17 @@ export default function App() {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         horizontal
-        onScroll={Animated.event([
-          {nativeEvent: {contentOffset: {x: scrollX}}},
-        ])}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {x: scrollX}}}],
+          {useNativeDriver: true},
+        )}
         scrollEventThrottle={16}
       />
       <Image
         style={styles.logo}
         source={require('../../../assets/ue_black_logo.png')}
       />
-      <Pagination />
+      <Pagination scrollX={scrollX} />
       <Ticker scrollX={scrollX} />
     </View>
   );
@@ -193,13 +224,13 @@ const styles = StyleSheet.create({
     color: '#444',
     textTransform: 'uppercase',
     fontSize: 24,
-    fontWeight: '800',
+    fontWeight: Platform.OS === 'android' ? 'bold' : '800',
     letterSpacing: 2,
     marginBottom: 5,
   },
   description: {
     color: '#ccc',
-    fontWeight: '600',
+    fontWeight: Platform.OS === 'android' ? 'bold' : '600',
     textAlign: 'left',
     width: width * 0.75,
     marginRight: 10,
@@ -259,7 +290,8 @@ const styles = StyleSheet.create({
     fontSize: TICKER_HEIGHT,
     lineHeight: TICKER_HEIGHT,
     textTransform: 'uppercase',
-    fontWeight: '800',
+    fontWeight: Platform.OS === 'android' ? 'bold' : '800',
+    // fontWeight: 'bold',
   },
   circleContainer: {
     alignItems: 'center',
