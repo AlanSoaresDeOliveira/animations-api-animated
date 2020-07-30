@@ -46,6 +46,7 @@ const Pagination = () => {
 };
 
 export default function App() {
+  const scrollX = React.useRef(new Animated.Value(0)).current;
   return (
     <View style={styles.container}>
       <StatusBar style="auto" hidden />
