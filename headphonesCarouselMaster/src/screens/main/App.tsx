@@ -16,6 +16,28 @@ const {width, height} = Dimensions.get('window');
 const LOGO_WIDTH = 220;
 const LOGO_HEIGHT = 40;
 const DOT_SIZE = 40;
+const TICKER_HEIGHT = 40;
+
+const Ticker = ({scrollX}) => {
+  const inputRange = [-width, 0, width];
+  const translateY = scrollX.interpolate({
+    inputRange,
+    outputRange: [TICKER_HEIGHT, 0, -TICKER_HEIGHT],
+  });
+  return (
+    <View style={styles.tickerContainer}>
+      <Animated.View style={{transform: [{translateY}]}}>
+        {data.map(({type}, index) => {
+          return (
+            <Text key={index} style={styles.tickerText}>
+              {type}
+            </Text>
+          );
+        })}
+      </Animated.View>
+    </View>
+  );
+};
 
 const Item = ({imageUri, heading, description, index, scrollX}) => {
   const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
@@ -106,6 +128,7 @@ export default function App() {
         source={require('../../../assets/ue_black_logo.png')}
       />
       <Pagination />
+      <Ticker scrollX={scrollX} />
     </View>
   );
 }
@@ -187,5 +210,20 @@ const styles = StyleSheet.create({
     borderRadius: DOT_SIZE / 2,
     borderWidth: 2,
     borderColor: '#ddd',
+  },
+
+  tickerContainer: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    // backgroundColor: 'red',
+    height: TICKER_HEIGHT,
+    overflow: 'hidden',
+  },
+  tickerText: {
+    fontSize: TICKER_HEIGHT,
+    lineHeight: TICKER_HEIGHT,
+    textTransform: 'uppercase',
+    fontWeight: '800',
   },
 });
