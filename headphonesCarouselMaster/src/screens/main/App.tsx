@@ -17,13 +17,50 @@ const LOGO_WIDTH = 220;
 const LOGO_HEIGHT = 40;
 const DOT_SIZE = 40;
 
-const Item = ({imageUri, heading, description}) => {
+const Item = ({imageUri, heading, description, index, scrollX}) => {
+  const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+  const inputRangeOpacity = [
+    (index - 0.3) * width,
+    index * width,
+    (index + 0.3) * width,
+  ];
+  const scale = scrollX.interpolate({
+    inputRange,
+    outputRange: [0, 1, 0],
+  });
+  const translateXHeading = scrollX.interpolate({
+    inputRange,
+    outputRange: [width * 0.2, 0, -width * 0.2],
+  });
+  const translateXDescription = scrollX.interpolate({
+    inputRange,
+    outputRange: [width * 0.6, 0, -width * 0.6],
+  });
+  const opacity = scrollX.interpolate({
+    inputRange: inputRangeOpacity,
+    outputRange: [0, 1, 0],
+  });
   return (
     <View style={styles.itemStyle}>
-      <Image source={imageUri} style={[styles.imageStyle]} />
+      <Animated.Image
+        source={imageUri}
+        style={[styles.imageStyle, {transform: [{scale}]}]}
+      />
       <View style={styles.textContainer}>
-        <Text style={[styles.heading]}>{heading}</Text>
-        <Text style={[styles.description]}>{description}</Text>
+        <Animated.Text
+          style={[
+            styles.heading,
+            {opacity, transform: [{translateX: translateXHeading}]},
+          ]}>
+          {heading}
+        </Animated.Text>
+        <Animated.Text
+          style={[
+            styles.description,
+            {opacity, transform: [{translateX: translateXDescription}]},
+          ]}>
+          {description}
+        </Animated.Text>
       </View>
     </View>
   );
@@ -50,13 +87,19 @@ export default function App() {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" hidden />
-      <FlatList
+      <Animated.FlatList
         keyExtractor={(item) => item.key}
         data={data}
-        renderItem={({item, index}) => <Item {...item} />}
+        renderItem={({item, index}) => (
+          <Item {...item} index={index} scrollX={scrollX} />
+        )}
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         horizontal
+        onScroll={Animated.event([
+          {nativeEvent: {contentOffset: {x: scrollX}}},
+        ])}
+        scrollEventThrottle={16}
       />
       <Image
         style={styles.logo}
