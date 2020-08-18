@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: 'bold',
     color: '#fff',
-    fontSize: 32,
+    fontSize: 30,
   },
   hero: {
     width: 288,
