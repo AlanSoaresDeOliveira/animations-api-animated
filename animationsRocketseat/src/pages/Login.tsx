@@ -20,7 +20,7 @@ const Login: React.FC = () => {
     imagePosition.value = withTiming(
       0,
       {
-        duration: 500,
+        duration: 490,
       },
       () => {
         titlePosition.value = sequence(
