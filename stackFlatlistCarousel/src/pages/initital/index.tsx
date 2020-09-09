@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import * as React from 'react';
 import {
   StatusBar,
@@ -11,7 +12,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 const {width} = Dimensions.get('screen');
-// import { EvilIcons } from '@expo/vector-icons';
+import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import {
   FlingGestureHandler,
   Directions,
